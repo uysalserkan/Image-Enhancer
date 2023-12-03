@@ -95,19 +95,55 @@ if __name__ == '__main__':
         required=True,
         help="Enter your images output folder path."
     )
+    parser.add_argument(
+        "--outscale",
+        default=4,
+        type=int,
+    )
+    parser.add_argument(
+        "--pre_pard",
+        default=0,
+        type=int,
+    )
+    parser.add_argument(
+        "--tile",
+        default=0,
+        type=int,
+    )
+    parser.add_argument(
+        "--tile_pad",
+        default=10,
+        type=int
+    )
+    parser.add_argument(
+        "--half",
+        default=False,
+        type=bool
+    )
+    parser.add_argument(
+        "--has_aligned",
+        default=False,
+        type=bool
+    )
+    parser.add_argument(
+        "--only_center_face",
+        default=False,
+        type=bool
+    )
+    parser.add_argument(
+        "--paste_back",
+        default=True,
+        type=bool
+    )
+    parser.add_argument(
+        "--gpu",
+        default=None,
+        type=int
+    )
 
     device = select_device()
 
     args = parser.parse_args()
-    args.outscale = 4
-    args.pre_pad = 0
-    args.tile = 0
-    args.tile_pad = 10
-    args.half = False
-    args.gpu = None if device == "cpu" else 0
-    args.has_aligned = False
-    args.only_center_face = False
-    args.paste_back = True
 
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path, exist_ok=True)
