@@ -31,7 +31,7 @@ def upscale_images(model, image_pats, args) -> None:
         img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
 
         _, _, output = model.enhance(
-            img,
+            [img],
             args.has_aligned,
             args.only_center_face,
             args.paste_back
