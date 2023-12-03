@@ -18,4 +18,4 @@ python enhance_images.py --input_path="low_images" --output_path="high_image"
 ## Run Dockerfile
 
 1. `docker build -t image_enhancer .`
-2. `docker run -it image_enhancer`
+2. `docker run -it image_enhancer -v $PWD/low_images:/low_images`
