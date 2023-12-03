@@ -6,7 +6,40 @@ from argparse import ArgumentParser
 import torch
 import cv2
 
-from real_esrgan.enhance import init_models
+from realesrgan import RealESRGANer
+from basicsr.archs.rrdbnet_arch import RRDBNet
+from gfpgan import GFPGANer
+
+
+def init_models(args):
+    """Model initialize."""
+    model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32, scale=4)
+    netscale = 4
+    file_url = ['https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth']
+    model_path = os.path.join('Real-ESRGAN', 'weights', 'RealESRGAN_x4plus.pth')
+
+    upsampler = RealESRGANer(
+        scale=netscale,
+        model_path=model_path,
+        dni_weight=None,
+        model=model,
+        tile=args.tile,
+        tile_pad=args.tile_pad,
+        pre_pad=args.pre_pad,
+        half=args.half,
+        gpu_id=args.gpu
+    )
+
+    face_enhancer = GFPGANer(
+        model_path='https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth',
+        upscale=args.outscale,
+        arch='clean',
+        channel_multiplier=2,
+        bg_upsampler=upsampler
+    )
+
+    return face_enhancer
+
 
 
 def select_device() -> torch.DeviceObjType:
@@ -31,7 +64,7 @@ def upscale_images(model, image_pats, args) -> None:
         img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
 
         _, _, output = model.enhance(
-            [img],
+            img,
             args.has_aligned,
             args.only_center_face,
             args.paste_back
