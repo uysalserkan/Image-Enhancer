@@ -4,11 +4,13 @@ import glob
 from argparse import ArgumentParser
 
 import torch
+from torch.utils.data import DataLoader
 import cv2
-
 from realesrgan import RealESRGANer
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from gfpgan import GFPGANer
+
+from ImageDataset import ImageDataset
 
 
 def init_models(args):
@@ -101,7 +103,7 @@ if __name__ == '__main__':
         type=int,
     )
     parser.add_argument(
-        "--pre_pard",
+        "--pre_pad",
         default=0,
         type=int,
     )
@@ -140,6 +142,11 @@ if __name__ == '__main__':
         default=None,
         type=int
     )
+    parser.add_argument(
+        "--batch",
+        default=1,
+        type=int
+    )
 
     device = select_device()
 
@@ -151,11 +158,17 @@ if __name__ == '__main__':
     # Model params
     model = init_models(args=args)
 
-    img_paths = sorted(glob.glob(os.path.join(args.input_path, '*')))
+    # img_paths = sorted(glob.glob(os.path.join(args.input_path, '*')))
 
-    print("Image Paths".center(50).replace(' ', '-'))
-    print(img_paths)
+    # print("Image Paths".center(50).replace(' ', '-'))
+    # print(img_paths)
 
-    upscale_images(model=model, image_pats=img_paths, args=args)
+    # upscale_images(model=model, image_pats=img_paths, args=args)
+
+    image_dataset = ImageDataset(folder_path=args.input_path, output_path=args.output_path, model=model)
+    dataloader = DataLoader(dataset=image_dataset, batch_size=args.batch, shuffle=True)
+    for _batch in dataloader:
+        print(f"{_batch}".center(50))
+
     print("Upscaling done".center(50).replace(' ', '-'))
 
